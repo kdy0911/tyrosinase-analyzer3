@@ -1,8 +1,8 @@
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
+import koreanize_matplotlib
 
 st.set_page_config(
     page_title="티로시나아제 실험 분석",
