@@ -1,39 +1,9 @@
 
-from pathlib import Path
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
-from matplotlib import font_manager, rcParams
-
-# --------------------------------------------------
-# 한글 글꼴 설정
-# 저장소에 fonts/NotoSansKR-VF.ttf 파일이 있어야 합니다.
-# --------------------------------------------------
-FONT_PATH = Path(__file__).parent / "fonts" / "NotoSansKR-VF.ttf"
-
-if FONT_PATH.exists():
-    font_manager.fontManager.addfont(str(FONT_PATH))
-    korean_font = font_manager.FontProperties(fname=str(FONT_PATH))
-    rcParams["font.family"] = korean_font.get_name()
-else:
-    korean_font = None
-
-rcParams["axes.unicode_minus"] = False
-
-
-def apply_korean_font(ax):
-    """그래프 제목, 축 이름, 눈금에 한글 글꼴을 적용합니다."""
-    if korean_font is not None:
-        ax.title.set_fontproperties(korean_font)
-        ax.xaxis.label.set_fontproperties(korean_font)
-        ax.yaxis.label.set_fontproperties(korean_font)
-        for label in ax.get_xticklabels():
-            label.set_fontproperties(korean_font)
-        for label in ax.get_yticklabels():
-            label.set_fontproperties(korean_font)
-
+plt.rcParams["axes.unicode_minus"] = False
 st.set_page_config(
     page_title="티로시나아제 실험 분석",
     page_icon="🧪",
@@ -446,19 +416,30 @@ if "tyrosinase_results" in st.session_state:
 
     fig, ax = plt.subplots(figsize=(9, 4))
 
+    # 그래프에는 영어 라벨을 사용해 한글 글꼴 문제를 피합니다.
+    english_names = {
+        "계피": "Cinnamon",
+        "녹차": "Green Tea",
+        "블루베리": "Blueberry",
+        "마늘": "Garlic",
+    }
+    plot_labels = [
+        english_names.get(str(name).strip(), f"Sample {i + 1}")
+        for i, name in enumerate(result_df["천연물"])
+    ]
+
     ax.bar(
-        result_df["천연물"],
+        plot_labels,
         result_df["억제율 (%)"]
     )
 
     ax.axhline(0, linewidth=1)
     ax.axhline(100, linestyle="--", linewidth=1)
 
-    ax.set_xlabel("천연물")
-    ax.set_ylabel("계산된 억제율 (%)")
-    ax.set_title("티로시나아제 억제율")
+    ax.set_xlabel("Natural Extract")
+    ax.set_ylabel("Inhibition Rate (%)")
+    ax.set_title("Tyrosinase Inhibition Rate")
     ax.tick_params(axis="x", rotation=20)
-    apply_korean_font(ax)
 
     fig.tight_layout()
     st.pyplot(fig)
@@ -530,3 +511,4 @@ if "tyrosinase_results" in st.session_state:
         file_name="tyrosinase_analysis.csv",
         mime="text/csv"
     )
+
