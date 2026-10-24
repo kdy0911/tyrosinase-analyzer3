@@ -2,8 +2,38 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
-import koreanize_matplotlib
+import os
+import platform
+from matplotlib import font_manager, rcParams
 
+# 그래프 한글 폰트 설정
+def set_korean_font():
+    system = platform.system()
+
+    if system == "Windows":
+        candidates = ["Malgun Gothic"]
+    elif system == "Darwin":
+        candidates = ["AppleGothic"]
+    else:
+        candidates = [
+            "NanumGothic",
+            "Noto Sans CJK KR",
+            "Noto Sans CJK JP",
+            "UnDotum"
+        ]
+
+    installed_fonts = {
+        font.name for font in font_manager.fontManager.ttflist
+    }
+
+    for font in candidates:
+        if font in installed_fonts:
+            rcParams["font.family"] = font
+            break
+
+    rcParams["axes.unicode_minus"] = False
+
+set_korean_font()
 st.set_page_config(
     page_title="티로시나아제 실험 분석",
     page_icon="🧪",
